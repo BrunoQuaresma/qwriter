@@ -62,7 +62,7 @@ func TestFileMatching(t *testing.T) {
 	var writer mockWriter
 	cli := cli.New(cli.Options{
 		Writer: &writer,
-		Stdout: &out,
+		Stdout: &out, // Redirect stdout to a buffer to avoid printing to the terminal.
 	})
 	for _, c := range tc {
 		t.Run(c.pattern, func(t *testing.T) {
