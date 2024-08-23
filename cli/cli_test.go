@@ -37,9 +37,13 @@ func TestFileMatching(t *testing.T) {
 		require.NoError(t, err, fmt.Sprintf("failed to write file %s", absolutePath))
 	}
 
+	// Define test cases for file matching. Each test case specifies a pattern to
+	// match files and the expected files that should be matched. If the pattern
+	// is invalid, the test case should have the error flag set to true.
 	tc := []struct {
 		pattern string
 		matches []string
+		error   bool
 	}{
 		{
 			pattern: filePath("site/*.js"),
@@ -56,18 +60,61 @@ func TestFileMatching(t *testing.T) {
 				filePath("site/script-2.js"),
 			},
 		},
+		{
+			pattern: filePath("site/**/*"),
+			matches: []string{
+				filePath("site/index.html"),
+				filePath("site/script.js"),
+				filePath("site/script-2.js"),
+				filePath("site/docs/tutorial.md"),
+				filePath("site/docs/intro.md"),
+			},
+		},
+		{
+			pattern: filePath("site/docs"),
+			error:   true,
+		},
+		{
+			pattern: filePath("site/**"),
+			error:   true,
+		},
+		{
+			// This pattern will not match any files so it is expected to return an
+			// error.
+			pattern: filePath("site/*.png"),
+			error:   true,
+		},
+		{
+			// This pattern is invalid because it uses the @! operator which is not
+			// supported by glob.
+			pattern: filePath("@!"),
+			error:   true,
+		},
 	}
 
-	var out bytes.Buffer
-	var writer mockWriter
+	// Execute the command "owriter --files <pattern>" for each test case. Verify
+	// that the writer is correctly targeting the specified files or returning an
+	// error.
+	var (
+		err    bytes.Buffer
+		writer mockWriter
+	)
 	cli := cli.New(cli.Options{
 		Writer: &writer,
-		Stdout: &out, // Redirect stdout to a buffer to avoid printing to the terminal.
+		Stderr: &err,
 	})
+	cli.MuteOut()
 	for _, c := range tc {
 		t.Run(c.pattern, func(t *testing.T) {
 			cli.Run([]string{"owriter", "--files", c.pattern})
-			require.ElementsMatch(t, writer.analyzedContent, c.matches)
+
+			if c.error {
+				require.NotEmpty(t, err.String(), "error should be present")
+			} else {
+				require.Empty(t, err.String(), "error should not be present")
+				require.ElementsMatch(t, writer.analyzedContent, c.matches)
+			}
+
 			writer.Reset()
 		})
 	}

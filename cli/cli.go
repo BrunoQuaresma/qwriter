@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -48,12 +49,12 @@ func New(o Options) *CLI {
 	cli.cmd = &cobra.Command{
 		Use:   "owriter",
 		Short: "OpenWriter CLI is a tool to generate and write text using OpenAI's GPT-4 model.",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			files, _ := cmd.Flags().GetString(string(FlagFiles))
 			if files != "" {
-				cli.reviewFiles(files)
-				return
+				return cli.reviewFiles(files)
 			}
+			return nil
 		},
 	}
 	cli.cmd.SetOut(cli.stdout)
@@ -74,24 +75,28 @@ func (cli *CLI) Run(args []string) error {
 	return cli.Execute()
 }
 
-func (cli *CLI) reviewFiles(pattern string) {
+// Mute disables the output of the CLI. This function is primarily used for
+// testing purposes.
+func (cli *CLI) MuteOut() {
+	cli.cmd.SetOut(io.Discard)
+}
+
+func (cli *CLI) reviewFiles(pattern string) error {
 	// The CLI only handle files and not directories so we use the WithFilesOnly
 	// option to raise an error if a directory is passed.
 	matches, err := doublestar.FilepathGlob(pattern, doublestar.WithFilesOnly())
 	if err != nil {
-		fmt.Fprintln(cli.stderr, pattern, "is not a valid pattern")
-		os.Exit(1)
+		return errors.New(pattern + " is an invalid pattern: " + err.Error())
 	}
 	if matches == nil {
-		fmt.Fprintln(cli.stderr, "No files found for pattern", pattern)
-		os.Exit(1)
+		return errors.New("no files found for pattern: " + pattern)
 	}
 	for _, path := range matches {
 		s, err := cli.writer.Suggestions(path)
 		if err != nil {
-			fmt.Fprintln(cli.stderr, "Error getting suggestions for", path, ":", err)
-			os.Exit(1)
+			return errors.New("failed to get suggestions for " + path + ": " + err.Error())
 		}
 		fmt.Fprint(cli.stdout, s)
 	}
+	return nil
 }
