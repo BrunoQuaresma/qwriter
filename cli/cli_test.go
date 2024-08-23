@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestFileMatching(t *testing.T) {
+func TestFilesMatching(t *testing.T) {
 	t.Parallel()
 
 	// Set up files by using the file path as the content. This helps identify
