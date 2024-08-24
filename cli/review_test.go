@@ -1,0 +1,264 @@
+package cli_test
+
+import (
+	"bytes"
+	"flag"
+	"fmt"
+	"io"
+	"path/filepath"
+	"testing"
+
+	"github.com/BrunoQuaresma/openwritter/cli"
+	"github.com/BrunoQuaresma/openwritter/pkg/owriter"
+	"github.com/gookit/goutil/fsutil"
+	"github.com/stretchr/testify/require"
+)
+
+var (
+	updateReviewOut = flag.Bool("update_review_output", false, "update review output golden files")
+)
+
+func TestReview_FilesMatching(t *testing.T) {
+	t.Parallel()
+
+	// Setup files with each file including its own path in the content. This
+	// helps identify which files are being read and passed to the writer, as the
+	// writer only has access to the content, not the file path.
+	temp := t.TempDir()
+
+	var f = []file{
+		{
+			Path:    filepath.Join(temp, "text-file.txt"),
+			Content: filepath.Join(temp, "text-file.txt"),
+		},
+		{
+			Path:    filepath.Join(temp, "go-file.go"),
+			Content: filepath.Join(temp, "go-file.go"),
+		},
+		{
+			Path:    filepath.Join(temp, "go-file-2.go"),
+			Content: filepath.Join(temp, "go-file-2.go"),
+		},
+		{
+			Path:    filepath.Join(temp, "site/script.js"),
+			Content: filepath.Join(temp, "site/script.js"),
+		},
+		{
+			Path:    filepath.Join(temp, "site/script-2.js"),
+			Content: filepath.Join(temp, "site/script-2.js"),
+		},
+		{
+			Path:    filepath.Join(temp, "site/index.html"),
+			Content: filepath.Join(temp, "site/index.html"),
+		},
+		{
+			Path:    filepath.Join(temp, "site/docs/tutorial.md"),
+			Content: filepath.Join(temp, "site/docs/tutorial.md"),
+		},
+		{
+			Path:    filepath.Join(temp, "site/docs/intro.md"),
+			Content: filepath.Join(temp, "site/docs/intro.md"),
+		},
+	}
+	err := setupFiles(f)
+	require.NoError(t, err, "failed to setup files")
+
+	// Define test cases for file matching. Each test case specifies a pattern to
+	// match files and the expected files that should be matched. If the pattern
+	// is invalid, the test case should have the error flag set to true.
+	tc := []struct {
+		pattern string
+		matches []string
+		error   bool
+	}{
+		{
+			pattern: filepath.Join(temp, "site/*.js"),
+			matches: []string{
+				f[3].Path,
+				f[4].Path,
+			},
+		},
+		{
+			pattern: filepath.Join(temp, "site/*"),
+			matches: []string{
+				f[3].Path,
+				f[4].Path,
+				f[5].Path,
+			},
+		},
+		{
+			pattern: filepath.Join(temp, "site/**/*"),
+			matches: []string{
+				f[3].Path,
+				f[4].Path,
+				f[5].Path,
+				f[6].Path,
+				f[7].Path,
+			},
+		},
+		{
+			pattern: filepath.Join(temp, "site/docs"),
+			error:   true,
+		},
+		{
+			pattern: filepath.Join(temp, "site/**"),
+			error:   true,
+		},
+		{
+			// This pattern will not match any files so it is expected to return an
+			// error.
+			pattern: filepath.Join(temp, "site/*.png"),
+			error:   true,
+		},
+		{
+			// This pattern is invalid because it uses the @! operator which is not
+			// supported by glob.
+			pattern: filepath.Join(temp, "@!"),
+			error:   true,
+		},
+	}
+
+	// Execute the command "owriter --files <pattern>" for each test case. Verify
+	// that the writer is correctly targeting the specified files or returning an
+	// error.
+	var (
+		stdError bytes.Buffer
+		writer   mockWriter
+	)
+	cli := cli.New(cli.Options{
+		Writer: &writer,
+		Stderr: &stdError,
+		Stdout: io.Discard,
+	})
+	for _, c := range tc {
+		t.Run(c.pattern, func(t *testing.T) {
+			cli.Run([]string{"review", c.pattern})
+
+			if c.error {
+				require.NotEmpty(t, stdError.String(), "error should be present")
+			} else {
+				require.Empty(t, stdError.String(), "error should not be present")
+				require.ElementsMatch(t, writer.analyzedContent, c.matches)
+			}
+
+			writer.reset()
+		})
+	}
+}
+
+func TestReview_Output(t *testing.T) {
+	t.Parallel()
+
+	// Setup test folder in a predictable path for testing with golden files. This
+	// ensures that the file paths remain consistent, as they are used in the test
+	// output for comparison.
+	temp := "/tmp/TestReview_Output"
+	err := fsutil.Mkdir(temp, fsutil.DefaultDirPerm)
+	require.NoError(t, err, fmt.Sprintf("failed to create test directory: %s", temp))
+	t.Cleanup(func() {
+		fsutil.SafeRemoveAll(temp)
+	})
+	// Setup files
+	var f = []file{
+		{
+			Path:    filepath.Join(temp, "docs/tutorial.md"),
+			Content: "This is a tutorial sample. With some tutorial testing text.",
+		},
+		{
+			Path:    filepath.Join(temp, "docs/intro.md"),
+			Content: "I think it is ok for now to have it under UserAutocomplete. You brought good arguments.",
+		},
+	}
+	err = setupFiles(f)
+	require.NoError(t, err, "failed to setup files")
+
+	// Set predictable suggestions for each file
+	var writer mockWriter
+	writer.setSuggestions(f[0].Content, []owriter.Suggestion{
+		{
+			Original: "This is a tutorial sample. With some tutorial testing text.",
+			Value:    "This is a tutorial sample with some test text.",
+		},
+	})
+	writer.setSuggestions(f[1].Content, []owriter.Suggestion{
+		{
+			Original: "I think it is ok for now to have it under UserAutocomplete.",
+			Value:    "I think it's fine for now to keep it under UserAutocomplete.",
+		},
+		{
+			Original: "You brought good arguments.",
+			Value:    "You made some good points.",
+		},
+	})
+
+	// Execute the command
+	var stdOut, stdErr bytes.Buffer
+	cli := cli.New(cli.Options{
+		Writer: &writer,
+		Stdout: &stdOut,
+		Stderr: &stdErr,
+	})
+	cli.Run([]string{"review", filepath.Join(temp, "docs/*.md")})
+	require.Empty(t, stdErr.String(), "error should not be present")
+
+	// Update golden files
+	goldenPath := "testdata/filesout.golden"
+	if *updateReviewOut {
+		fsutil.WriteFile(goldenPath, stdOut.String(), fsutil.DefaultFilePerm)
+	}
+
+	// Verify output
+	golden := fsutil.ReadFile(goldenPath)
+	require.Equal(t, string(golden), stdOut.String())
+}
+
+type mockWriter struct {
+	// analyzedContent is a list of all the content that was analyzed by the
+	// writer. This helps to verify that the writer is reading the correct
+	// content.
+	analyzedContent []string
+	// suggestionsByText maps text to a list of suggestions. This is used to
+	// predict the suggestions that the writer will return for specific file
+	// content during tests, ensuring accurate and consistent test results.
+	suggestionsByText map[string][]owriter.Suggestion
+}
+
+func (m *mockWriter) Suggestions(text string) ([]owriter.Suggestion, error) {
+	m.analyzedContent = append(m.analyzedContent, text)
+	return m.suggestionsByText[text], nil
+}
+
+func (m *mockWriter) Apply(text string, suggestions []owriter.Suggestion) (string, error) {
+	return text, nil
+}
+
+// setSuggestions is a utility function that sets the suggestions for a specific
+// file content. Helps to predict the suggestions that the writer will return
+// during tests.
+func (m *mockWriter) setSuggestions(text string, suggestions []owriter.Suggestion) {
+	if m.suggestionsByText == nil {
+		m.suggestionsByText = make(map[string][]owriter.Suggestion)
+	}
+	m.suggestionsByText[text] = suggestions
+}
+
+// reset clears the analyzed content list. Helps to reset the state of the
+// writer between tests.
+func (m *mockWriter) reset() {
+	m.analyzedContent = []string{}
+}
+
+type file struct {
+	Path    string
+	Content string
+}
+
+func setupFiles(files []file) error {
+	for _, f := range files {
+		err := fsutil.WriteFile(f.Path, f.Content, fsutil.DefaultFilePerm)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
