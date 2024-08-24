@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	updateReviewOut = flag.Bool("update_review_output", false, "update review output golden files")
+	updateReviewOut = flag.Bool("update_review_out", false, "update review output golden files")
 )
 
 func TestReview_FilesMatching(t *testing.T) {
@@ -202,7 +202,7 @@ func TestReview_Output(t *testing.T) {
 	require.Empty(t, stdErr.String(), "error should not be present")
 
 	// Update golden files
-	goldenPath := "testdata/filesout.golden"
+	goldenPath := "testdata/review_out.golden"
 	if *updateReviewOut {
 		fsutil.WriteFile(goldenPath, stdOut.String(), fsutil.DefaultFilePerm)
 	}
