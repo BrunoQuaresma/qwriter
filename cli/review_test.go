@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/BrunoQuaresma/openwritter/cli"
+	"github.com/BrunoQuaresma/openwritter/cli/testutils"
 	"github.com/BrunoQuaresma/openwritter/pkg/owriter"
 	"github.com/gookit/goutil/fsutil"
 	"github.com/stretchr/testify/require"
@@ -123,10 +124,10 @@ func TestReview_FilesMatching(t *testing.T) {
 	// error.
 	var (
 		stdError bytes.Buffer
-		writer   mockWriter
+		w        testutils.MockWriter
 	)
 	cli := cli.New(cli.Options{
-		Writer: &writer,
+		Writer: &w,
 		Stderr: &stdError,
 		Stdout: io.Discard,
 	})
@@ -138,10 +139,10 @@ func TestReview_FilesMatching(t *testing.T) {
 				require.NotEmpty(t, stdError.String(), "error should be present")
 			} else {
 				require.Empty(t, stdError.String(), "error should not be present")
-				require.ElementsMatch(t, writer.analyzedContent, c.matches)
+				require.ElementsMatch(t, w.AnalyzedContent, c.matches)
 			}
 
-			writer.reset()
+			w.Reset()
 		})
 	}
 }
@@ -173,14 +174,14 @@ func TestReview_Output(t *testing.T) {
 	require.NoError(t, err, "failed to setup files")
 
 	// Set predictable suggestions for each file
-	var writer mockWriter
-	writer.setSuggestions(f[0].Content, []owriter.Suggestion{
+	var w testutils.MockWriter
+	w.SetSuggestions(f[0].Content, []owriter.Suggestion{
 		{
 			Original: "This is a tutorial sample. With some tutorial testing text.",
 			Value:    "This is a tutorial sample with some test text.",
 		},
 	})
-	writer.setSuggestions(f[1].Content, []owriter.Suggestion{
+	w.SetSuggestions(f[1].Content, []owriter.Suggestion{
 		{
 			Original: "I think it is ok for now to have it under UserAutocomplete.",
 			Value:    "I think it's fine for now to keep it under UserAutocomplete.",
@@ -194,7 +195,7 @@ func TestReview_Output(t *testing.T) {
 	// Execute the command
 	var stdOut, stdErr bytes.Buffer
 	cli := cli.New(cli.Options{
-		Writer: &writer,
+		Writer: &w,
 		Stdout: &stdOut,
 		Stderr: &stdErr,
 	})
@@ -210,42 +211,6 @@ func TestReview_Output(t *testing.T) {
 	// Verify output
 	golden := fsutil.ReadFile(goldenPath)
 	require.Equal(t, string(golden), stdOut.String())
-}
-
-type mockWriter struct {
-	// analyzedContent is a list of all the content that was analyzed by the
-	// writer. This helps to verify that the writer is reading the correct
-	// content.
-	analyzedContent []string
-	// suggestionsByText maps text to a list of suggestions. This is used to
-	// predict the suggestions that the writer will return for specific file
-	// content during tests, ensuring accurate and consistent test results.
-	suggestionsByText map[string][]owriter.Suggestion
-}
-
-func (m *mockWriter) Suggestions(text string) ([]owriter.Suggestion, error) {
-	m.analyzedContent = append(m.analyzedContent, text)
-	return m.suggestionsByText[text], nil
-}
-
-func (m *mockWriter) Apply(text string, suggestions []owriter.Suggestion) (string, error) {
-	return text, nil
-}
-
-// setSuggestions is a utility function that sets the suggestions for a specific
-// file content. Helps to predict the suggestions that the writer will return
-// during tests.
-func (m *mockWriter) setSuggestions(text string, suggestions []owriter.Suggestion) {
-	if m.suggestionsByText == nil {
-		m.suggestionsByText = make(map[string][]owriter.Suggestion)
-	}
-	m.suggestionsByText[text] = suggestions
-}
-
-// reset clears the analyzed content list. Helps to reset the state of the
-// writer between tests.
-func (m *mockWriter) reset() {
-	m.analyzedContent = []string{}
 }
 
 type file struct {

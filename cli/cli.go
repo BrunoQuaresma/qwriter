@@ -38,17 +38,17 @@ func New(o Options) *CLI {
 		o.Stderr = os.Stderr
 	}
 
+	// Setup
 	cli := &CLI{
 		writer: o.Writer,
 		stdout: o.Stdout,
 		stderr: o.Stderr,
 	}
-	cli.cmd = &cobra.Command{
-		Use:   "owriter",
-		Short: "OpenWriter CLI is a tool to generate and write text using OpenAI's GPT-4 model.",
-	}
+	cli.cmd = cli.root()
 	cli.cmd.SetOut(cli.stdout)
 	cli.cmd.SetErr(cli.stderr)
+
+	// Add commands
 	cli.cmd.AddCommand(cli.review())
 
 	return cli

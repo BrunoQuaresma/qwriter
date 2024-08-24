@@ -11,7 +11,7 @@ import (
 
 func (cli *CLI) review() *cobra.Command {
 	return &cobra.Command{
-		Use:   "review [glob pattern]",
+		Use:   "review [pattern]",
 		Short: "Review files and displays suggestions.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
