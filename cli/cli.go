@@ -91,12 +91,31 @@ func (cli *CLI) reviewFiles(pattern string) error {
 	if matches == nil {
 		return errors.New("no files found for pattern: " + pattern)
 	}
+
+	var suggestionsByPath = make(map[string][]owriter.Suggestion)
 	for _, path := range matches {
 		s, err := cli.writer.Suggestions(path)
 		if err != nil {
 			return errors.New("failed to get suggestions for " + path + ": " + err.Error())
 		}
-		fmt.Fprint(cli.stdout, s)
+		suggestionsByPath[path] = s
 	}
+
+	i := 0
+	for path, suggestions := range suggestionsByPath {
+		// Add one line break between files
+		if i > 0 {
+			fmt.Fprintln(cli.stdout)
+		}
+		for j, s := range suggestions {
+			// Add one line break between suggestions
+			if j > 0 {
+				fmt.Fprintln(cli.stdout)
+			}
+			fmt.Fprintf(cli.stdout, "%d/%d for %s\n- %s\n+ %s\n", j+1, len(suggestions), path, s.Original, s.Value)
+		}
+		i++
+	}
+
 	return nil
 }
