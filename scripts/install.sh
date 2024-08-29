@@ -31,3 +31,16 @@ chmod +x /tmp/qwriter
 # Add the qwriter binary to the PATH
 sudo mv /tmp/qwriter /usr/local/bin/qwriter
 PATH=$PATH:/usr/local/bin/qwriter
+
+# Instructions
+echo "Before you can start using QWriter, you'll need to set your OpenAI API key."
+echo "This key allows QWriter to connect to OpenAI's powerful language models."
+echo ""
+echo "1. $(tput bold)Generate an API Key:$(tput sgr0)"
+echo "   Follow the instructions in the OpenAI quickstart guide:"
+echo "   $(tput smul)https://platform.openai.com/docs/quickstart/create-and-export-an-api-key$(tput sgr0)"
+echo ""
+echo "2. $(tput bold)Export the API Key:$(tput sgr0)"
+echo "   Set the QWRITER_OPENAI_KEY environment variable with your API key:"
+echo "   export QWRITER_OPENAI_KEY=your-key-here"
+echo ""
