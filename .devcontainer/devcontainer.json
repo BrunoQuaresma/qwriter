@@ -26,5 +26,13 @@
 	// "remoteUser": "root"
 	"mounts": [
 		"type=bind,source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,readonly"
-	]
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"github.vscode-github-actions",
+				"ms-vscode.makefile-tools"
+			]
+		}
+	}
 }

@@ -27,7 +27,7 @@ func TestFix(t *testing.T) {
 
 			// Given: a code input with syntax errors.
 			var (
-				client     = qwriter.New(ai.NewOpenAI(os.Getenv("OPENAI_KEY")))
+				client     = qwriter.New(ai.NewOpenAI(os.Getenv("QWRITER_OPENAI_KEY")))
 				inputFile  = path.Join("testdata", fmt.Sprintf("%s.input", syntax))
 				goldenFile = path.Join("testdata", fmt.Sprintf("%s.golden", syntax))
 			)
