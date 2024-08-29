@@ -25,7 +25,7 @@ else
 fi
 
 # Download the qwriter binary
-curl -fsSL -o /tmp/qwriter "https://github.com/BrunoQuaresma/qwriter/releases/download/v0.1.1/qwriter-$OS-$ARCH"
+curl -fsSL -o /tmp/qwriter "https://github.com/BrunoQuaresma/qwriter/releases/download/v0.1.2/qwriter-$OS-$ARCH"
 chmod +x /tmp/qwriter
 
 # Add the qwriter binary to the PATH
