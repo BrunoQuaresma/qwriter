@@ -41,7 +41,7 @@ func New(o Options) (*CLI, error) {
 	}
 	cli.cmd = &cobra.Command{
 		Use:   "qwriter [text]",
-		Short: "OpenWriter CLI is a tool to generate and write text using OpenAI's GPT-4 model.",
+		Short: "QWriter CLI is a tool to generate and write text using OpenAI's GPT-4 model.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txt := args[0]
