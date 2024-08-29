@@ -3,7 +3,7 @@
 
 package_name="qwriter"
 	
-platforms=("darwin/arm64" "linux/arm64")
+platforms=("darwin/arm64" "darwin/amd64" "linux/arm64" "linux/amd64")
 
 for platform in "${platforms[@]}"
 do
