@@ -29,3 +29,23 @@ qwriter "Please improve this text"
 ```
 
 QWriter will analyze the provided text and return a refined version, helping you to communicate more effectively.
+
+## Examples
+
+Discover how QWriter CLI can enhance your workflow:
+
+### Generate Better Commit Messages
+
+QWriter can help you craft more meaningful and impactful commit messages. For example:
+
+```bash
+git commit -m "$(qwriter 'Add commit message example')"
+```
+
+### Revise and Improve Documentation
+
+QWriter makes it easy to refine your documentation. You can iterate over all your Markdown files and update them with improved content in one go:
+
+```bash
+for file in /path/to/folder/*.md; do qwriter "$(cat "$file")" > "$file"; done
+```
