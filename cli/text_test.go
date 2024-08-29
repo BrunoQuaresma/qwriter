@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRoot_Output(t *testing.T) {
+func TestText_Output(t *testing.T) {
 	t.Parallel()
 
 	var (
@@ -29,7 +29,7 @@ func TestRoot_Output(t *testing.T) {
 	w.SetSuggestions(text, []owriter.Suggestion{
 		{Original: text, Value: "improved text"},
 	})
-	cli.Run([]string{text})
+	cli.Run([]string{"text", text})
 
 	// Then return the improved text without errors
 	require.Empty(t, stdError.String())

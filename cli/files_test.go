@@ -16,10 +16,10 @@ import (
 )
 
 var (
-	updateReviewOut = flag.Bool("update_review_out", false, "update review output golden files")
+	updateFilesOut = flag.Bool("update_files_out", false, "update files output golden files")
 )
 
-func TestReview_FilesMatching(t *testing.T) {
+func TestFiles_Matching(t *testing.T) {
 	t.Parallel()
 
 	// Setup files with each file including its own path in the content. This
@@ -133,7 +133,7 @@ func TestReview_FilesMatching(t *testing.T) {
 	})
 	for _, c := range tc {
 		t.Run(c.pattern, func(t *testing.T) {
-			cli.Run([]string{"review", c.pattern})
+			cli.Run([]string{"files", c.pattern})
 
 			if c.error {
 				require.NotEmpty(t, stdError.String(), "error should be present")
@@ -147,7 +147,7 @@ func TestReview_FilesMatching(t *testing.T) {
 	}
 }
 
-func TestReview_Output(t *testing.T) {
+func TestFiles_Output(t *testing.T) {
 	t.Parallel()
 
 	// Setup test folder in a predictable path for testing with golden files. This
@@ -199,12 +199,12 @@ func TestReview_Output(t *testing.T) {
 		Stdout: &stdOut,
 		Stderr: &stdErr,
 	})
-	cli.Run([]string{"review", filepath.Join(temp, "docs/*.md")})
+	cli.Run([]string{"files", filepath.Join(temp, "docs/*.md")})
 	require.Empty(t, stdErr.String(), "error should not be present")
 
 	// Update golden files
-	goldenPath := "testdata/review_out.golden"
-	if *updateReviewOut {
+	goldenPath := "testdata/files_out.golden"
+	if *updateFilesOut {
 		fsutil.WriteFile(goldenPath, stdOut.String(), fsutil.DefaultFilePerm)
 	}
 

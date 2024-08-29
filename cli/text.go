@@ -6,10 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func (cli *CLI) root() *cobra.Command {
+func (cli *CLI) text() *cobra.Command {
 	return &cobra.Command{
-		Use:   "owriter [text to improve]",
-		Short: "OpenWriter CLI is a tool to generate and write text using OpenAI's GPT-4 model.",
+		Use:   "text [text]",
+		Short: "Review text and return improved version.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			txt := args[0]

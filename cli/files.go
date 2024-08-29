@@ -9,23 +9,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func (cli *CLI) review() *cobra.Command {
+func (cli *CLI) files() *cobra.Command {
 	return &cobra.Command{
-		Use:   "review [pattern]",
-		Short: "Review files and displays suggestions.",
+		Use:   "files [pattern]",
+		Short: "Review files to get improvement suggestions.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			p := args[0]
-			// The CLI only handle files and not directories so we use the WithFilesOnly
-			// option to raise an error if a directory is passed.
-			matches, err := doublestar.FilepathGlob(p, doublestar.WithFilesOnly())
+			pattern := args[0]
+			matches, err := doublestar.FilepathGlob(pattern, doublestar.WithFilesOnly())
 			if err != nil {
-				return fmt.Errorf("failed to match files for pattern %s: %w", p, err)
+				return fmt.Errorf("failed to match files for pattern %s: %w", pattern, err)
 			}
 			if matches == nil {
-				return fmt.Errorf("no files found for pattern: %s", p)
+				return fmt.Errorf("no files found for pattern: %s", pattern)
 			}
 
+			// Get suggestions for each file
 			var suggestionsByPath = make(map[string][]owriter.Suggestion)
 			for _, p := range matches {
 				text := fsutil.ReadFile(p)
@@ -36,7 +35,7 @@ func (cli *CLI) review() *cobra.Command {
 				suggestionsByPath[p] = s
 			}
 
-			// Print the suggestions
+			// Print suggestions
 			i := 0
 			for p, suggestions := range suggestionsByPath {
 				// Add one line break between files
