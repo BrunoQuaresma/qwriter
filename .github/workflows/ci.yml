@@ -32,6 +32,8 @@ jobs:
       cli: ${{ steps.changes.outputs.cli }}
       qwriter: ${{ steps.changes.outputs.qwriter }}
     steps:
+      - uses: actions/checkout@v4
+      
       - uses: dorny/paths-filter@v3
         id: changes
         with:
