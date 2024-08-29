@@ -4,19 +4,19 @@ import (
 	"io"
 	"os"
 
-	"github.com/BrunoQuaresma/openwritter/pkg/owriter"
+	"github.com/BrunoQuaresma/openwritter/pkg/qwriter"
 	"github.com/spf13/cobra"
 )
 
 type CLI struct {
-	writer owriter.Writer
+	writer qwriter.Writer
 	cmd    *cobra.Command
 	stdout io.Writer
 	stderr io.Writer
 }
 
 type Options struct {
-	Writer owriter.Writer
+	Writer qwriter.Writer
 	Stdout io.Writer
 	Stderr io.Writer
 }
@@ -45,7 +45,7 @@ func New(o Options) *CLI {
 		stderr: o.Stderr,
 	}
 	cli.cmd = &cobra.Command{
-		Use:   "owriter",
+		Use:   "qwriter",
 		Short: "OpenWriter CLI is a tool to generate and write text using OpenAI's GPT-4 model.",
 	}
 	cli.cmd.AddCommand(cli.files())

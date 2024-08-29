@@ -4,12 +4,12 @@ import (
 	"os"
 
 	"github.com/BrunoQuaresma/openwritter/cli"
-	"github.com/BrunoQuaresma/openwritter/pkg/owriter"
-	"github.com/BrunoQuaresma/openwritter/pkg/owriter/ai"
+	"github.com/BrunoQuaresma/openwritter/pkg/qwriter"
+	"github.com/BrunoQuaresma/openwritter/pkg/qwriter/ai"
 )
 
 func main() {
-	w := owriter.New(ai.NewOpenAI(os.Getenv("OPENAI_KEY")))
+	w := qwriter.New(ai.NewOpenAI(os.Getenv("QWRITER_OPENAI_KEY")))
 	cli := cli.New(cli.Options{
 		Writer: w,
 	})

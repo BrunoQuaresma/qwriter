@@ -1,4 +1,4 @@
-package owriter_test
+package qwriter_test
 
 import (
 	"flag"
@@ -7,8 +7,8 @@ import (
 	"path"
 	"testing"
 
-	"github.com/BrunoQuaresma/openwritter/pkg/owriter"
-	"github.com/BrunoQuaresma/openwritter/pkg/owriter/ai"
+	"github.com/BrunoQuaresma/openwritter/pkg/qwriter"
+	"github.com/BrunoQuaresma/openwritter/pkg/qwriter/ai"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,7 +27,7 @@ func TestFix(t *testing.T) {
 
 			// Given: a code input with syntax errors.
 			var (
-				client     = owriter.New(ai.NewOpenAI(os.Getenv("OPENAI_KEY")))
+				client     = qwriter.New(ai.NewOpenAI(os.Getenv("OPENAI_KEY")))
 				inputFile  = path.Join("testdata", fmt.Sprintf("%s.input", syntax))
 				goldenFile = path.Join("testdata", fmt.Sprintf("%s.golden", syntax))
 			)

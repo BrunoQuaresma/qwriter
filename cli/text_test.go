@@ -6,7 +6,7 @@ import (
 
 	"github.com/BrunoQuaresma/openwritter/cli"
 	"github.com/BrunoQuaresma/openwritter/cli/testutils"
-	"github.com/BrunoQuaresma/openwritter/pkg/owriter"
+	"github.com/BrunoQuaresma/openwritter/pkg/qwriter"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,7 +26,7 @@ func TestText_Output(t *testing.T) {
 
 	// When passing a text to the command
 	text := "improve this text"
-	w.SetSuggestions(text, []owriter.Suggestion{
+	w.SetSuggestions(text, []qwriter.Suggestion{
 		{Original: text, Value: "improved text"},
 	})
 	cli.Run([]string{"text", text})

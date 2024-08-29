@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/BrunoQuaresma/openwritter/pkg/owriter"
+	"github.com/BrunoQuaresma/openwritter/pkg/qwriter"
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/gookit/goutil/fsutil"
 	"github.com/spf13/cobra"
@@ -25,7 +25,7 @@ func (cli *CLI) files() *cobra.Command {
 			}
 
 			// Get suggestions for each file
-			var suggestionsByPath = make(map[string][]owriter.Suggestion)
+			var suggestionsByPath = make(map[string][]qwriter.Suggestion)
 			for _, p := range matches {
 				text := fsutil.ReadFile(p)
 				s, err := cli.writer.Suggestions(string(text))

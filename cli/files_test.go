@@ -10,7 +10,7 @@ import (
 
 	"github.com/BrunoQuaresma/openwritter/cli"
 	"github.com/BrunoQuaresma/openwritter/cli/testutils"
-	"github.com/BrunoQuaresma/openwritter/pkg/owriter"
+	"github.com/BrunoQuaresma/openwritter/pkg/qwriter"
 	"github.com/gookit/goutil/fsutil"
 	"github.com/stretchr/testify/require"
 )
@@ -119,7 +119,7 @@ func TestFiles_Matching(t *testing.T) {
 		},
 	}
 
-	// Execute the command "owriter --files <pattern>" for each test case. Verify
+	// Execute the command "qwriter --files <pattern>" for each test case. Verify
 	// that the writer is correctly targeting the specified files or returning an
 	// error.
 	var (
@@ -175,13 +175,13 @@ func TestFiles_Output(t *testing.T) {
 
 	// Set predictable suggestions for each file
 	var w testutils.MockWriter
-	w.SetSuggestions(f[0].Content, []owriter.Suggestion{
+	w.SetSuggestions(f[0].Content, []qwriter.Suggestion{
 		{
 			Original: "This is a tutorial sample. With some tutorial testing text.",
 			Value:    "This is a tutorial sample with some test text.",
 		},
 	})
-	w.SetSuggestions(f[1].Content, []owriter.Suggestion{
+	w.SetSuggestions(f[1].Content, []qwriter.Suggestion{
 		{
 			Original: "I think it is ok for now to have it under UserAutocomplete.",
 			Value:    "I think it's fine for now to keep it under UserAutocomplete.",

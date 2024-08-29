@@ -1,11 +1,11 @@
-package owriter
+package qwriter
 
 import (
 	"context"
 	"encoding/json"
 	"strings"
 
-	"github.com/BrunoQuaresma/openwritter/pkg/owriter/ai"
+	"github.com/BrunoQuaresma/openwritter/pkg/qwriter/ai"
 )
 
 type Writer interface {
@@ -18,12 +18,12 @@ type Suggestion struct {
 	Value    string `json:"value"`
 }
 
-type owriter struct {
+type qwriter struct {
 	ai ai.Client
 }
 
 func New(ai ai.Client) Writer {
-	return &owriter{
+	return &qwriter{
 		ai: ai,
 	}
 }
@@ -32,7 +32,7 @@ const prompt = "You will be provided with text or code containing user-facing te
 	"Focus only on the text visible to the user, ignoring any code-related issues or comments." +
 	"After making improvements, return a JSON array where each element includes the original text and its corresponding suggestion in this format: { original: \"...\", value: \"...\" }."
 
-func (w *owriter) Suggestions(text string) ([]Suggestion, error) {
+func (w *qwriter) Suggestions(text string) ([]Suggestion, error) {
 	ctx := context.Background()
 
 	w.ai.SetPrompt(prompt)
@@ -50,7 +50,7 @@ func (w *owriter) Suggestions(text string) ([]Suggestion, error) {
 	return suggestions, nil
 }
 
-func (w *owriter) Apply(text string, suggestions []Suggestion) (string, error) {
+func (w *qwriter) Apply(text string, suggestions []Suggestion) (string, error) {
 	for _, s := range suggestions {
 		text = strings.ReplaceAll(text, s.Original, s.Value)
 	}
