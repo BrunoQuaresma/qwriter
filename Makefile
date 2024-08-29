@@ -1,4 +1,5 @@
-all: build/qwriter
+all: build
 
-build/qwriter: $(wildcard **/*.go)
-	go build -o ./build/qwriter ./cmd
+.PHONY: build
+build: $(wildcard **/*.go)
+	bash ./scripts/build.sh
