@@ -7,10 +7,6 @@ import (
 )
 
 type MockWriter struct {
-	// analyzedContent is a list of all the content that was analyzed by the
-	// writer. This helps to verify that the writer is reading the correct
-	// content.
-	AnalyzedContent []string
 	// suggestionsByText maps text to a list of suggestions. This is used to
 	// predict the suggestions that the writer will return for specific file
 	// content during tests, ensuring accurate and consistent test results.
@@ -18,7 +14,6 @@ type MockWriter struct {
 }
 
 func (m *MockWriter) Suggestions(text string) ([]qwriter.Suggestion, error) {
-	m.AnalyzedContent = append(m.AnalyzedContent, text)
 	return m.SuggestionsByText[text], nil
 }
 
@@ -38,10 +33,4 @@ func (m *MockWriter) SetSuggestions(text string, suggestions []qwriter.Suggestio
 		m.SuggestionsByText = make(map[string][]qwriter.Suggestion)
 	}
 	m.SuggestionsByText[text] = suggestions
-}
-
-// Reset clears the analyzed content list. Helps to reset the state of the
-// writer between tests.
-func (m *MockWriter) Reset() {
-	m.AnalyzedContent = []string{}
 }

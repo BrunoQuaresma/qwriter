@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/BrunoQuaresma/openwritter/cli"
@@ -9,11 +10,26 @@ import (
 )
 
 func main() {
+	stdout := os.Stdout
+	stderr := os.Stderr
+
+	key := os.Getenv("QWRITER_OPENAI_KEY")
+	if key == "" {
+		fmt.Fprintln(stderr, "Please, set the QWRITER_OPENAI_KEY environment variable with your OpenAI key.")
+		os.Exit(1)
+	}
 	w := qwriter.New(ai.NewOpenAI(os.Getenv("QWRITER_OPENAI_KEY")))
-	cli := cli.New(cli.Options{
+	cli, err := cli.New(cli.Options{
 		Writer: w,
+		Stdout: stdout,
+		Stderr: stderr,
 	})
-	if err := cli.Execute(); err != nil {
+	if err != nil {
+		fmt.Fprintln(stderr, err)
+		os.Exit(1)
+	}
+
+	if err = cli.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
