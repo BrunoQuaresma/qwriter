@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+
+    - name: Build
+      run: make build/qwriter
+
+    - name: Archive build
+      uses: actions/upload-artifact@v4
+      with:
+        name: build
+        path: build/qwriter
+
+  VerifyChanges:
+    runs-on: ubuntu-latest
+    outputs:
+      cli: ${{ steps.changes.outputs.cli }}
+      qwriter: ${{ steps.changes.outputs.qwriter }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            cli:
+              - 'cli/**/*.go'
+            qwriter:
+              - 'pkg/qwriter/**/*.go'
+  
+  CLI-Test:
+    needs: VerifyChanges
+    runs-on: ubuntu-latest
+    if: needs.VerifyChanges.outputs.cli == 'true'
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+
+    - name: Test
+      run: go test -v ./cli
+
+  QWriter-Test:
+    needs: VerifyChanges
+    if: needs.VerifyChanges.outputs.qwriter == 'true'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23'
+        
+    - name: Test
+      env:
+        QWRITER_OPENAI_KEY: ${{ secrets.QWRITER_OPENAI_KEY }}
+      run: go test -v ./pkg/qwriter
