@@ -1,6 +1,6 @@
 module github.com/BrunoQuaresma/openwritter
 
-go 1.22.1
+go 1.23.0
 
 require (
 	github.com/sashabaranov/go-openai v1.28.1
