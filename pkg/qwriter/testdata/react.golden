@@ -443,7 +443,7 @@ export const TemplateScheduleForm: FC<TemplateScheduleForm> = ({
             }
             label={
               <StackLabel>
-                Allow users to automatically start workspaces on a schedule.
+                Allow users to schedule automatic starts for their workspaces.
               </StackLabel>
             }
           />
