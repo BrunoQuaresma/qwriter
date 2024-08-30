@@ -14,6 +14,7 @@ type CLI struct {
 	cmd    *cobra.Command
 	stdout io.Writer
 	stderr io.Writer
+	config *Config
 }
 
 type Options struct {
@@ -33,17 +34,29 @@ func New(o Options) (*CLI, error) {
 		return nil, errors.New("cli.Options.Stderr is required")
 	}
 
+	// Flags
+	var configPath string
+
 	// Setup
 	cli := &CLI{
 		writer: o.Writer,
 		stdout: o.Stdout,
 		stderr: o.Stderr,
+		config: nil,
 	}
 	cli.cmd = &cobra.Command{
 		Use:   "qwriter [text]",
 		Short: "QWriter CLI is a tool to generate and write text using OpenAI's GPT-4 model.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if configPath != "" {
+				config, err := NewConfig(configPath)
+				if err != nil {
+					return fmt.Errorf("failed to load configuration file: %w", err)
+				}
+				cli.config = config
+			}
+
 			txt := args[0]
 			s, err := cli.writer.Suggestions(txt)
 			if err != nil {
@@ -59,6 +72,7 @@ func New(o Options) (*CLI, error) {
 	}
 	cli.cmd.SetOut(cli.stdout)
 	cli.cmd.SetErr(cli.stderr)
+	cli.cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to the QWriter CLI configuration file")
 
 	return cli, nil
 }
