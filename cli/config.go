@@ -3,17 +3,13 @@ package cli
 import (
 	"os"
 
+	"github.com/BrunoQuaresma/openwritter/pkg/qwriter"
 	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
 	path     string
-	Profiles []Profile `yaml:"profiles"`
-}
-
-type Profile struct {
-	Name        string `yaml:"name"`
-	Description string `yaml:"description"`
+	Profiles []qwriter.Profile `yaml:"profiles"`
 }
 
 func NewConfig(path string) (*Config, error) {

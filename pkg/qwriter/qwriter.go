@@ -3,6 +3,7 @@ package qwriter
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/BrunoQuaresma/openwritter/pkg/qwriter/ai"
@@ -19,23 +20,32 @@ type Suggestion struct {
 }
 
 type qwriter struct {
-	ai ai.Client
+	ai      ai.Client
+	profile Profile
 }
 
-func New(ai ai.Client) Writer {
+type Options struct {
+	AI      ai.Client
+	Profile Profile
+}
+
+func New(o Options) Writer {
 	return &qwriter{
-		ai: ai,
+		ai:      o.AI,
+		profile: o.Profile,
 	}
 }
 
-const prompt = "You will be provided with text or code containing user-facing text. Your task is to correct any grammar and spelling errors and enhance the clarity and tone of the copy." +
-	"Focus only on the text visible to the user, ignoring any code-related issues or comments." +
+// Adding this prompt after the profile prompt ensures that the suggestions are
+// returned in the expected format.
+const prompt = "You will be provided with text or code. Your task is to %s. " +
+	"Focus only on the text, ignoring any code-related words. " +
 	"After making improvements, return a JSON array where each element includes the original text and its corresponding suggestion in this format: { original: \"...\", value: \"...\" }."
 
 func (w *qwriter) Suggestions(text string) ([]Suggestion, error) {
 	ctx := context.Background()
 
-	w.ai.SetPrompt(prompt)
+	w.ai.SetPrompt(fmt.Sprintf(prompt, w.profile.Description))
 	resp, err := w.ai.SendMessage(ctx, text)
 	if err != nil {
 		return []Suggestion{}, err
