@@ -17,19 +17,22 @@ var update = flag.Bool("update", false, "update .golden files")
 func TestFix(t *testing.T) {
 	t.Parallel()
 
-	syntaxes := []string{
-		"react",
+	tests := []string{
+		"grammar",
 	}
 
-	for _, syntax := range syntaxes {
-		t.Run(syntax, func(t *testing.T) {
+	for _, tc := range tests {
+		t.Run(tc, func(t *testing.T) {
 			t.Parallel()
 
 			// Given: a code input with syntax errors.
 			var (
-				client     = qwriter.New(ai.NewOpenAI(os.Getenv("QWRITER_OPENAI_KEY")))
-				inputFile  = path.Join("testdata", fmt.Sprintf("%s.input", syntax))
-				goldenFile = path.Join("testdata", fmt.Sprintf("%s.golden", syntax))
+				client = qwriter.New(qwriter.Options{
+					AI:      ai.NewOpenAI(os.Getenv("QWRITER_OPENAI_KEY")),
+					Profile: qwriter.DefaultProfile,
+				})
+				inputFile  = path.Join("testdata", fmt.Sprintf("%s.input", tc))
+				goldenFile = path.Join("testdata", fmt.Sprintf("%s.golden", tc))
 			)
 			inputData, err := os.ReadFile(inputFile)
 			if err != nil {

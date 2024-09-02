@@ -34,3 +34,5 @@ func (m *MockWriter) SetSuggestions(text string, suggestions []qwriter.Suggestio
 	}
 	m.SuggestionsByText[text] = suggestions
 }
+
+func (m *MockWriter) SetProfile(qwriter.Profile) {}
