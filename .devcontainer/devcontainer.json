@@ -31,7 +31,8 @@
 		"vscode": {
 			"extensions": [
 				"github.vscode-github-actions",
-				"ms-vscode.makefile-tools"
+				"ms-vscode.makefile-tools",
+				"golang.go"
 			]
 		}
 	}
