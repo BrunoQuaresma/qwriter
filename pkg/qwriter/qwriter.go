@@ -39,7 +39,7 @@ func New(o Options) Writer {
 
 // Adding this prompt after the profile prompt ensures that the suggestions are
 // returned in the expected format.
-const prompt = "You will be provided with text or code. Your task is to %s. " +
+const prompt = "You will be provided with text or code. Your task is to %s " +
 	"After making improvements, return a JSON array where each element includes the original text and its corresponding suggestion in this format: { original: \"...\", value: \"...\" }."
 
 func (w *qwriter) Suggestions(text string) ([]Suggestion, error) {
