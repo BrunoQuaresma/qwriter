@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/BrunoQuaresma/openwritter/pkg/qwriter"
+	"github.com/atotto/clipboard"
 	"github.com/spf13/cobra"
 )
 
@@ -38,6 +39,7 @@ func New(o Options) (*CLI, error) {
 	var (
 		configPath string
 		profile    = qwriter.DefaultProfile.Name
+		copy       bool
 	)
 
 	// Setup
@@ -75,13 +77,22 @@ func New(o Options) (*CLI, error) {
 				return fmt.Errorf("failed to apply suggestions for %s: %w", txt, err)
 			}
 			fmt.Fprintln(cli.stdout, txt)
+
+			if copy {
+				err = clipboard.WriteAll(txt)
+				if err != nil {
+					return fmt.Errorf("failed to copy text to clipboard: %w", err)
+				}
+			}
+
 			return nil
 		},
 	}
 	cli.cmd.SetOut(cli.stdout)
 	cli.cmd.SetErr(cli.stderr)
 	cli.cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to the QWriter CLI configuration file")
-	cli.cmd.Flags().StringVarP(&profile, "profile", "p", qwriter.DefaultProfile.Name, "	Profile to use for reviewing and generating text")
+	cli.cmd.Flags().StringVarP(&profile, "profile", "p", qwriter.DefaultProfile.Name, "Profile to use for reviewing and generating text")
+	cli.cmd.Flags().BoolVar(&copy, "copy", false, "Copy the reviwed and generated text to the clipboard")
 
 	return cli, nil
 }
