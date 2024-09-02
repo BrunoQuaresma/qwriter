@@ -19,8 +19,7 @@ func main() {
 		os.Exit(1)
 	}
 	w := qwriter.New(qwriter.Options{
-		AI:      ai.NewOpenAI(os.Getenv("QWRITER_OPENAI_KEY")),
-		Profile: qwriter.DefaultProfile,
+		AI: ai.NewOpenAI(os.Getenv("QWRITER_OPENAI_KEY")),
 	})
 	cli, err := cli.New(cli.Options{
 		Writer: w,

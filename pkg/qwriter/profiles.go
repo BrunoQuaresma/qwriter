@@ -6,6 +6,6 @@ type Profile struct {
 }
 
 var DefaultProfile = Profile{
-	Name:        "Default",
-	Description: "Correct any grammar and spelling errors and enhance the clarity and tone of the text.",
+	Name:        "default",
+	Description: "correct any grammar and spelling errors and enhance the clarity and tone of the text.",
 }

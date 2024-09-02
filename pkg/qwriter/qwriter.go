@@ -10,6 +10,7 @@ import (
 )
 
 type Writer interface {
+	SetProfile(Profile)
 	Suggestions(text string) ([]Suggestion, error)
 	Apply(text string, suggestions []Suggestion) (string, error)
 }
@@ -39,7 +40,6 @@ func New(o Options) Writer {
 // Adding this prompt after the profile prompt ensures that the suggestions are
 // returned in the expected format.
 const prompt = "You will be provided with text or code. Your task is to %s. " +
-	"Focus only on the text, ignoring any code-related words. " +
 	"After making improvements, return a JSON array where each element includes the original text and its corresponding suggestion in this format: { original: \"...\", value: \"...\" }."
 
 func (w *qwriter) Suggestions(text string) ([]Suggestion, error) {
@@ -66,4 +66,8 @@ func (w *qwriter) Apply(text string, suggestions []Suggestion) (string, error) {
 	}
 
 	return text, nil
+}
+
+func (w *qwriter) SetProfile(p Profile) {
+	w.profile = p
 }
