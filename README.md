@@ -25,7 +25,7 @@ export QWRITER_OPENAI_KEY=your-key-here
 Once your API key is set, you can start using QWriter to enhance your text. The syntax is straightforward:
 
 ```bash
-qwriter "Please improve this text"
+qwriter improve "Please improve this text"
 ```
 
 QWriter will analyze the provided text and return a refined version, helping you to communicate more effectively.
@@ -39,7 +39,7 @@ Discover how QWriter CLI can enhance your workflow:
 QWriter can help you craft more meaningful and impactful commit messages. For example:
 
 ```bash
-git commit -m "$(qwriter 'Add commit message example')"
+git commit -m "$(qwriter improve 'Add commit message example')"
 ```
 
 ### Revise and Improve Documentation
@@ -47,5 +47,5 @@ git commit -m "$(qwriter 'Add commit message example')"
 QWriter makes it easy to refine your documentation. You can iterate over all your Markdown files and update them with improved content in one go:
 
 ```bash
-for file in /path/to/folder/*.md; do qwriter "$(cat "$file")" > "$file"; done
+for file in /path/to/folder/*.md; do qwriter improve "$(cat "$file")" > "$file"; done
 ```

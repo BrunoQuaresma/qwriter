@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCLI_TextOutput(t *testing.T) {
+func TestImprove_Output(t *testing.T) {
 	t.Parallel()
 
 	var (
@@ -32,14 +32,14 @@ func TestCLI_TextOutput(t *testing.T) {
 	w.SetSuggestions(text, []qwriter.Suggestion{
 		{Original: text, Value: "improved text"},
 	})
-	cli.Run([]string{text})
+	cli.Run([]string{"improve", text})
 
 	// Then return the improved text without errors
 	require.Empty(t, stdError.String())
 	require.Equal(t, "improved text\n", stdOut.String())
 }
 
-func TestCLI_NonExistentProfile(t *testing.T) {
+func TestImprove_NonExistentProfile(t *testing.T) {
 	t.Parallel()
 
 	var (
@@ -55,14 +55,14 @@ func TestCLI_NonExistentProfile(t *testing.T) {
 	require.NoError(t, err)
 
 	// When passing an invalid profile to the command
-	cli.Run([]string{"improve this text", "-p", "nonexistent"})
+	cli.Run([]string{"improve", "improve this text", "-p", "nonexistent"})
 
 	// Then return an error message
 	require.NotEmpty(t, stdError)
 	require.Contains(t, stdError.String(), "profile nonexistent not found")
 }
 
-func TestCLI_ProfileFromConfig(t *testing.T) {
+func TestImprove_ProfileFromConfig(t *testing.T) {
 	t.Parallel()
 
 	var (
@@ -92,7 +92,7 @@ profiles:
 	w.SetSuggestions(text, []qwriter.Suggestion{
 		{Original: text, Value: "improved text"},
 	})
-	cli.Run([]string{text, "-c", configPath, "-p", "ui-copy"})
+	cli.Run([]string{"improve", text, "-c", configPath, "-p", "ui-copy"})
 
 	// Then return the improved text without errors
 	require.Empty(t, stdError.String())
