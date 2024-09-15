@@ -13,13 +13,13 @@ func main() {
 	stdout := os.Stdout
 	stderr := os.Stderr
 
-	key := os.Getenv("QWRITER_OPENAI_KEY")
+	key := os.Getenv("OPENAI_API_KEY")
 	if key == "" {
-		fmt.Fprintln(stderr, "Please, set the QWRITER_OPENAI_KEY environment variable with your OpenAI key.")
+		fmt.Fprintln(stderr, "Please, set the OPENAI_API_KEY environment variable with your OpenAI key.")
 		os.Exit(1)
 	}
 	w := qwriter.New(qwriter.Options{
-		AI: ai.NewOpenAI(os.Getenv("QWRITER_OPENAI_KEY")),
+		AI: ai.NewOpenAI(os.Getenv("OPENAI_API_KEY")),
 	})
 	cli, err := cli.New(cli.Options{
 		Writer: w,

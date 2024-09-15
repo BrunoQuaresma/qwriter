@@ -15,9 +15,9 @@ curl -fsSL https://raw.githubusercontent.com/BrunoQuaresma/qwriter/main/scripts/
 Before you can start using QWriter, you'll need to set your OpenAI API key. This key allows QWriter to connect to OpenAI's powerful language models.
 
 1. **Generate an API Key**: Follow the instructions in the OpenAI [quickstart guide](https://platform.openai.com/docs/quickstart/create-and-export-an-api-key) to create your API key.
-2. **Export the API Key**: Set the `QWRITER_OPENAI_KEY` environment variable with your API key:
+2. **Export the API Key**: Set the `OPENAI_API_KEY` environment variable with your API key:
 ```bash
-export QWRITER_OPENAI_KEY=your-key-here
+export OPENAI_API_KEY=your-key-here
 ```
 
 ## Usage
