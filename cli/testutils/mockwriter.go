@@ -13,7 +13,7 @@ type MockWriter struct {
 	SuggestionsByText map[string][]qwriter.Suggestion
 }
 
-func (m *MockWriter) Suggestions(text string) ([]qwriter.Suggestion, error) {
+func (m *MockWriter) Improve(text string) ([]qwriter.Suggestion, error) {
 	return m.SuggestionsByText[text], nil
 }
 

@@ -14,7 +14,7 @@ import (
 
 var update = flag.Bool("update", false, "update .golden files")
 
-func TestFix(t *testing.T) {
+func TestImprove(t *testing.T) {
 	t.Parallel()
 
 	tests := []string{
@@ -41,7 +41,7 @@ func TestFix(t *testing.T) {
 
 			// When: fix the input code.
 			input := string(inputData)
-			suggestions, err := client.Suggestions(input)
+			suggestions, err := client.Improve(input)
 			require.NoError(t, err, "failed to get suggestions")
 			resp, err := client.Apply(input, suggestions)
 			if err != nil {

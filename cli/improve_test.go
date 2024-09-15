@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCLI_TextOutput(t *testing.T) {
+func TestImprove_Output(t *testing.T) {
 	t.Parallel()
 
 	var (
@@ -39,7 +39,7 @@ func TestCLI_TextOutput(t *testing.T) {
 	require.Equal(t, "improved text\n", stdOut.String())
 }
 
-func TestCLI_NonExistentProfile(t *testing.T) {
+func TestImprove_NonExistentProfile(t *testing.T) {
 	t.Parallel()
 
 	var (
@@ -62,7 +62,7 @@ func TestCLI_NonExistentProfile(t *testing.T) {
 	require.Contains(t, stdError.String(), "profile nonexistent not found")
 }
 
-func TestCLI_ProfileFromConfig(t *testing.T) {
+func TestImprove_ProfileFromConfig(t *testing.T) {
 	t.Parallel()
 
 	var (

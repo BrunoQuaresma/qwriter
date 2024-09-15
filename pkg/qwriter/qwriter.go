@@ -11,7 +11,7 @@ import (
 
 type Writer interface {
 	SetProfile(Profile)
-	Suggestions(text string) ([]Suggestion, error)
+	Improve(text string) ([]Suggestion, error)
 	Apply(text string, suggestions []Suggestion) (string, error)
 }
 
@@ -42,7 +42,7 @@ func New(o Options) Writer {
 const prompt = "You will be provided with text or code. Your task is to %s " +
 	"After making improvements, return a JSON array where each element includes the original text and its corresponding suggestion in this format: { original: \"...\", value: \"...\" }."
 
-func (w *qwriter) Suggestions(text string) ([]Suggestion, error) {
+func (w *qwriter) Improve(text string) ([]Suggestion, error) {
 	ctx := context.Background()
 
 	w.ai.SetPrompt(fmt.Sprintf(prompt, w.profile.Description))
