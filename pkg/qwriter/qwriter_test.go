@@ -28,7 +28,7 @@ func TestImprove(t *testing.T) {
 			// Given: a code input with syntax errors.
 			var (
 				client = qwriter.New(qwriter.Options{
-					AI:      ai.NewOpenAI(os.Getenv("QWRITER_OPENAI_KEY")),
+					AI:      ai.NewOpenAI(os.Getenv("OPENAI_API_KEY")),
 					Profile: qwriter.DefaultProfile,
 				})
 				inputFile  = path.Join("testdata", fmt.Sprintf("%s.input", tc))

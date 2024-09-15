@@ -72,5 +72,5 @@ jobs:
         
     - name: Test
       env:
-        QWRITER_OPENAI_KEY: ${{ secrets.QWRITER_OPENAI_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: go test -v ./pkg/qwriter
