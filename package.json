@@ -1,17 +1,19 @@
 {
   "name": "qwriter",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
+  "bin": {
+    "qwriter": "./bin/cli.js"
+  },
   "scripts": {
-    "start": "tsx ./cli/main.ts",
-    "build": "tsc && vite build"
+    "start": "tsx cli.ts",
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/node": "22.9.0",
     "tsx": "4.19.2",
-    "typescript": "5.6.2",
-    "vite": "5.4.10"
+    "typescript": "5.6.2"
   },
   "dependencies": {
     "@inquirer/prompts": "7.0.1",
