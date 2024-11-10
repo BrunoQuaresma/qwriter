@@ -18,10 +18,10 @@ dependencies:
     specifier: 11.0.0
     version: 11.0.0
   openai:
-    specifier: ^4.71.1
+    specifier: 4.71.1
     version: 4.71.1
   ora:
-    specifier: ^8.1.1
+    specifier: 8.1.1
     version: 8.1.1
 
 devDependencies:
