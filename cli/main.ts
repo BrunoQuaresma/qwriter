@@ -2,6 +2,9 @@ import { input, select, confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
 import fs from "node:fs/promises";
+import { glob } from "glob";
+import OpenAI from "openai";
+import ora from "ora";
 
 const NAME = "qwriter";
 const DEFAULT_CONFIG = `./${NAME}.json`;
@@ -13,7 +16,9 @@ async function main() {
 
   program
     .command("init")
-    .description(`Initialize a new ${NAME} config`)
+    .description(
+      "Initializes a QWriter configuration file with your preferred settings for generating and formatting content. This command will guide you through setting up the basic options to get started quickly."
+    )
     .action(async () => {
       const goal = await input({
         message: chalk.bold("What is your main objective?"),
@@ -101,6 +106,143 @@ async function main() {
           "✔"
         )} Configuration file saved successfully to ${chalk.bold(configPath)}`
       );
+    });
+
+  program
+    .command("review")
+    .description(
+      "Reviews and rewrites content in the specified file path, enhancing tone, clarity, and structure based on your QWriter settings. Use this command to refine multiple files, making your content more effective and engaging."
+    )
+    .argument("<path>", "The file path to the content to review.")
+    .option(
+      "-c, --config <path>",
+      "The path to the QWriter configuration file.",
+      DEFAULT_CONFIG
+    )
+    .action(async (path, options: { config: string }) => {
+      let [_, err] = await catchError(
+        fs.access(options.config, fs.constants.F_OK)
+      );
+      if (err) {
+        console.log(
+          `${chalk.red("✖")} No configuration exists at ${chalk.bold(
+            options.config
+          )}.`
+        );
+        return;
+      }
+
+      const [config, readErr] = await catchError(
+        fs.readFile(options.config, "utf-8")
+      );
+      if (readErr) {
+        console.log(`${chalk.red("✖")} Failed to read configuration file.`);
+        console.error(chalk.red(readErr));
+        return;
+      }
+      if (!config) {
+        console.log(`${chalk.red("✖")} Empty configuration file.`);
+        return;
+      }
+      const { goal, topic, audience, tone } = JSON.parse(config) as {
+        goal: string;
+        topic: string;
+        audience: string;
+        tone: string;
+      };
+
+      const prompt = `
+You are an expert editor skilled in enhancing content for clarity, engagement, and effectiveness across various formats.
+
+Objective: The user’s goal is to "${goal}".
+
+Content Description:
+- Topic: The content is about "${topic}".
+- Audience: The intended audience is "${audience}".
+- Tone: The content should use a "${tone}" tone to resonate with the target readers.
+
+Instructions:
+1. For content targeted at a general audience, ensure language is clear, friendly, and avoids unnecessary jargon.
+2. If the content is technical (e.g., documentation or code comments), focus on simplifying complex explanations while maintaining accuracy. Avoid altering code functionality if present.
+3. Adapt the language to fit the "${tone}" tone specified, making it ${tone.toLowerCase()}.
+
+Enhance the text as follows:
+- Adjust the language to be suitable for the "${audience}" audience.
+- Improve readability, conciseness, and flow, aligning with the specified "${goal}".
+- Where necessary, rephrase for engagement and clarity.
+- Ensure terminology aligns with the topic while being accessible to the intended audience.
+
+Output only the revised text without extra explanations or formatting, so it can be seamlessly integrated into the user’s original files.
+`;
+
+      if (!process.env.OPENAI_API_KEY) {
+        console.log(
+          `${chalk.red("✖")} Missing OPENAI_API_KEY environment variable.`
+        );
+        return;
+      }
+      const openAI = new OpenAI();
+
+      const files = await glob(path);
+      for (const file of files) {
+        const [content, readErr] = await catchError(fs.readFile(file, "utf-8"));
+        if (readErr) {
+          console.log(
+            `${chalk.red("✖")} Failed to read content from ${chalk.bold(file)}.`
+          );
+          console.error(chalk.red(readErr));
+          continue;
+        }
+        if (!content) {
+          console.log(
+            `${chalk.red("✖")} Empty content in ${chalk.bold(file)}.`
+          );
+          continue;
+        }
+
+        const spinner = ora(`Reviewing ${chalk.bold(file)}...`).start();
+        const [chatResult, chatError] = await catchError(
+          openAI.chat.completions.create({
+            messages: [
+              { role: "system", content: prompt },
+              { role: "user", content },
+            ],
+            model: "gpt-4o",
+          })
+        );
+        spinner.stop();
+        if (chatError) {
+          console.log(
+            `${chalk.red("✖")} Failed to review content in ${chalk.bold(file)}.`
+          );
+          console.error(chalk.red(chatError));
+          continue;
+        }
+        const revisedContent = chatResult!.choices[0].message.content;
+        if (!revisedContent) {
+          console.log(
+            `${chalk.red("✖")} No revised content generated for ${chalk.bold(
+              file
+            )}.`
+          );
+          continue;
+        }
+        const [_, writeErr] = await catchError(
+          fs.writeFile(file, revisedContent)
+        );
+        if (writeErr) {
+          console.log(
+            `${chalk.red("✖")} Failed to write revised content to ${chalk.bold(
+              file
+            )}.`
+          );
+          console.error(chalk.red(writeErr));
+          continue;
+        }
+        console.log(
+          `${chalk.green("✔")} Revised content saved to ${chalk.bold(file)}`
+        );
+      }
     });
 
   program.parse();
