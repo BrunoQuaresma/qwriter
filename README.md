@@ -42,19 +42,14 @@ npx qwriter init
 ✔ Who is your target audience for this content? Small business owners.
 ✔ What tone would you like for the content? Friendly
 ✔ Where would you like to save the configuration file? ./qwriter.json
+✔ Configuration file saved successfully to ./qwriter.json
 ```
-
-> _"Configuration file saved successfully to ./qwriter.json"_ 🎉
-
----
 
 ### 2. `qwriter review` - Review and Rewrite Content
 
 With your config file set up, use this command to review and rewrite files, whether it’s for clear documentation, engaging marketing copy, or understandable code comments.
 
 #### Example Usage Scenarios
-
----
 
 #### Scenario 1: Sprucing Up Marketing Copy
 
@@ -64,8 +59,6 @@ _Your SaaS feature release sounds stiff. QWriter can help make it more friendly!
 npx qwriter review ./content/marketing-copy.txt -c ./qwriter.json
 ```
 
----
-
 #### Scenario 2: Making Technical Documentation Accessible
 
 _Turn a dense API setup guide into something beginners won’t fear!_
@@ -73,8 +66,6 @@ _Turn a dense API setup guide into something beginners won’t fear!_
 ```bash
 npx qwriter review ./docs/api-setup.md -c ./qwriter.json -x "Make it approachable for beginners"
 ```
-
----
 
 #### Scenario 3: Cleaning Up Code Comments for Clarity
 
@@ -84,13 +75,9 @@ _Your code comments need translation. Let QWriter help._
 npx qwriter review ./src/new-feature.js -c ./qwriter.json -x "Clarify comments without altering functionality"
 ```
 
----
-
 ## File Content Examples (Before & After)
 
 Want to see the magic in action? Here’s a peek at what QWriter can do:
-
----
 
 ### Example 1: Marketing Copy (`marketing-copy.txt`)
 
@@ -105,8 +92,6 @@ Our new automated billing feature is designed to streamline your payment process
 ```plaintext
 Meet our new automated billing feature—built to simplify your payments! Now, you can automate invoicing, receive timely reports, and get clear insights into your business performance, so you can focus on what matters most.
 ```
-
----
 
 ### Example 2: Technical Documentation (`api-setup.md`)
 
@@ -131,8 +116,6 @@ Meet our new automated billing feature—built to simplify your payments! Now, y
 3. **Set Up the SDK**: Pass your API key to initialize the SDK.
 4. **Retrieve Data**: Call the SDK’s `fetchData` method to pull data from our API. See the documentation for details.
 ```
-
----
 
 ### Example 3: Code Comments (`new-feature.js`)
 
@@ -174,8 +157,6 @@ function logResults(results) {
 }
 ```
 
----
-
 ## Command Options
 
 - **`-c, --config <path>`**: Specify a custom config file path (defaults to `./qwriter.json`).
@@ -188,7 +169,5 @@ MIT License
 ## Contributing
 
 We’re open to PRs and issues! QWriter is always in beta in our hearts, and we love fresh ideas.
-
----
 
 And that’s QWriter—your friendly, AI-powered editor for all things text and code. Because even your files deserve a little polish! 🧑‍💻✨
