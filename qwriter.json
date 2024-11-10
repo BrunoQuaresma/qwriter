@@ -1,6 +1,6 @@
 {
-  "goal": "Improve the copy of my CLI outputs",
-  "topic": "It is a CLI that helps others to improve their product copy",
-  "audience": "mostly developers and people that uses CLIs",
-  "tone": "technical"
+  "goal": "Ensure clarity, instructional quality, and technical accuracy",
+  "topic": "CLI tool usage and configuration setup",
+  "audience": "Developers and technical users setting up or using QWriter",
+  "tone": "Instructional"
 }
