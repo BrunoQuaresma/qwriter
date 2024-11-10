@@ -1,6 +1,4 @@
-# QWriter 📝
-
-> **Because every file deserves a glow-up!**
+# QWriter
 
 QWriter is a CLI tool that goes beyond “just another ChatGPT API wrapper” and makes your text and code files shine. Sure, it leverages the ChatGPT API, but this isn’t about simple questions and answers. QWriter is your trusty editing sidekick, making technical documentation readable, code comments crystal-clear, and marketing copy engaging.
 
