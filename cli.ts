@@ -6,13 +6,17 @@ import { glob } from "glob";
 import OpenAI from "openai";
 import ora from "ora";
 
-const NAME = "qwriter";
-const DEFAULT_CONFIG = `./${NAME}.json`;
+const DEFAULT_CONFIG = `./qwriter.json`;
 
 async function main() {
   const program = new Command();
 
-  program.name(NAME).description("QWriter CLI").version("0.0.1");
+  program
+    .name("QWriter")
+    .description(
+      "QWriter is a CLI tool designed to enhance and polish the copy in your text and code files. It reviews content for tone, clarity, and readability, making it easy to improve everything from documentation and comments to marketing copy. With configurable options, QWriter tailors its suggestions to your specific audience and goals, giving your content a professional edge."
+    )
+    .version("0.0.1");
 
   program
     .command("init")
@@ -119,7 +123,12 @@ async function main() {
       "The path to the QWriter configuration file.",
       DEFAULT_CONFIG
     )
-    .action(async (path, options: { config: string }) => {
+    .option(
+      "-x, --context <context>",
+      "Allows you to provide additional context to guide QWriter's content improvements. Use this to specify extra details about your project, audience, or unique requirements that can help tailor the output more precisely.",
+      ""
+    )
+    .action(async (path, options: { config: string; context: string }) => {
       let [_, err] = await catchError(
         fs.access(options.config, fs.constants.F_OK)
       );
@@ -152,28 +161,31 @@ async function main() {
       };
 
       const prompt = `
-You are an expert editor skilled in enhancing content for clarity, engagement, and effectiveness across various formats.
-
-Objective: The user’s goal is to "${goal}".
-
-Content Description:
-- Topic: The content is about "${topic}".
-- Audience: The intended audience is "${audience}".
-- Tone: The content should use a "${tone}" tone to resonate with the target readers.
-
-Instructions:
-1. For content targeted at a general audience, ensure language is clear, friendly, and avoids unnecessary jargon.
-2. If the content is technical (e.g., documentation or code comments), focus on simplifying complex explanations while maintaining accuracy. Avoid altering code functionality if present.
-3. Adapt the language to fit the "${tone}" tone specified, making it ${tone.toLowerCase()}.
-
-Enhance the text as follows:
-- Adjust the language to be suitable for the "${audience}" audience.
-- Improve readability, conciseness, and flow, aligning with the specified "${goal}".
-- Where necessary, rephrase for engagement and clarity.
-- Ensure terminology aligns with the topic while being accessible to the intended audience.
-
-Output only the revised text without extra explanations or formatting, so it can be seamlessly integrated into the user’s original files.
-`;
+        You are an expert editor skilled in enhancing content for clarity, engagement, and effectiveness across various formats.
+        
+        Objective: The user's goal is to "${goal}".
+        
+        Content Description:
+        - Topic: The content is about "${topic}".
+        - Audience: The intended audience is "${audience}".
+        - Tone: The content should use a "${tone}" tone to resonate with the target readers.
+        
+        Additional Context:
+        ${options.context || "No additional context provided."}
+        
+        Instructions:
+        1. For content targeted at a general audience, ensure language is clear, friendly, and avoids unnecessary jargon.
+        2. If the content is technical (e.g., documentation or code comments), focus on simplifying complex explanations while maintaining accuracy. Avoid altering code functionality if present.
+        3. Adapt the language to fit the "${tone}" tone specified, making it ${tone.toLowerCase()}.
+        
+        Enhance the text as follows:
+        - Adjust the language to be suitable for the "${audience}" audience.
+        - Improve readability, conciseness, and flow, aligning with the specified "${goal}".
+        - Where necessary, rephrase for engagement and clarity.
+        - Ensure terminology aligns with the topic while being accessible to the intended audience.
+        
+        Output only the revised text without extra explanations or formatting, so it can be seamlessly integrated into the users original files.
+      `;
 
       if (!process.env.OPENAI_API_KEY) {
         console.log(
